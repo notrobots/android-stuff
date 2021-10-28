@@ -45,19 +45,6 @@ fun <T> requireNotEmpty(value: Array<T>?, lazyMessage: () -> Any): Array<T> {
     }
 }
 
-/**
- * Executes the given [block] inside a try-catch block and then invokes [result]
- * with the thrown exception or null if no exception was thrown
- */
-fun tryRun(block: () -> Unit, result: (Exception?) -> Unit) {
-    try {
-        block()
-        result(null)
-    } catch (e: Exception) {
-        result(e)
-    }
-}
-
 //endregion
 
 fun <T, V> swap(a: T, b: T, get: (T) -> V, set: (T, V) -> Unit) {
