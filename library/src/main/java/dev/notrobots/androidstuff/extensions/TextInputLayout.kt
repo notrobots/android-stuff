@@ -3,6 +3,7 @@ package dev.notrobots.androidstuff.extensions
 import android.text.TextWatcher
 import android.widget.TextView
 import androidx.annotation.StringRes
+import androidx.core.widget.addTextChangedListener
 import com.google.android.material.textfield.TextInputLayout
 
 val TextInputLayout.hasErrors
@@ -15,7 +16,9 @@ val TextInputLayout.hasErrors
  * returned by this method
  */
 fun TextInputLayout.setClearErrorOnType(): TextWatcher? {
-    return editText?.setClearErrorOnType()
+    return editText?.addTextChangedListener {
+        error = null
+    }
 }
 
 /**
@@ -25,7 +28,11 @@ fun TextInputLayout.setClearErrorOnType(): TextWatcher? {
  * returned by this method
  */
 inline fun TextInputLayout.setErrorWhen(error: String?, crossinline condition: (CharSequence?, Int, Int, Int) -> Boolean): TextWatcher? {
-    return editText?.setErrorWhen(error, condition)
+    return editText?.addTextChangedListener(onTextChanged = { text, start, before, count ->
+        if (condition(text, start, before, count)) {
+            setError(error)
+        }
+    })
 }
 
 /**
@@ -35,7 +42,11 @@ inline fun TextInputLayout.setErrorWhen(error: String?, crossinline condition: (
  * returned by this method
  */
 inline fun TextInputLayout.setErrorWhen(error: String?, crossinline condition: (CharSequence?) -> Boolean): TextWatcher? {
-    return editText?.setErrorWhen(error, condition)
+    return editText?.addTextChangedListener(onTextChanged = { text, _, _, _ ->
+        if (condition(text)) {
+            setError(error)
+        }
+    })
 }
 
 /**
