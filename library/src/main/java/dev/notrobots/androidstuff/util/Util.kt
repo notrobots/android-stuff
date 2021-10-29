@@ -18,7 +18,7 @@ fun error(message: String): Nothing {
 
 //region Errors/Exceptions
 
-fun <T : CharSequence> requireNotEmpty(value: T?, lazyMessage: () -> Any): T {
+inline fun <T : CharSequence> requireNotEmpty(value: T?, lazyMessage: () -> Any): T {
     if (value.isNullOrEmpty()) {
         val message = lazyMessage()
         throw Exception(message.toString())
@@ -27,7 +27,7 @@ fun <T : CharSequence> requireNotEmpty(value: T?, lazyMessage: () -> Any): T {
     }
 }
 
-fun <T : Iterable<T>> requireNotEmpty(value: T?, lazyMessage: () -> Any): T {
+inline fun <T : Iterable<T>> requireNotEmpty(value: T?, lazyMessage: () -> Any): T {
     if (value == null || value.count() == 0) {
         val message = lazyMessage()
         throw Exception(message.toString())
@@ -36,7 +36,7 @@ fun <T : Iterable<T>> requireNotEmpty(value: T?, lazyMessage: () -> Any): T {
     }
 }
 
-fun <T> requireNotEmpty(value: Array<T>?, lazyMessage: () -> Any): Array<T> {
+inline fun <T> requireNotEmpty(value: Array<T>?, lazyMessage: () -> Any): Array<T> {
     if (value == null || value.count() == 0) {
         val message = lazyMessage()
         throw Exception(message.toString())
