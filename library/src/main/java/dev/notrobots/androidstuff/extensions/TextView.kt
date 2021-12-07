@@ -29,7 +29,9 @@ fun TextView.setClearErrorOnType(): TextWatcher {
 inline fun TextView.setErrorWhen(error: String?, crossinline condition: (CharSequence?, Int, Int, Int) -> Boolean): TextWatcher {
     return addTextChangedListener(onTextChanged = { text, start, before, count ->
         if (condition(text, start, before, count)) {
-            setError(error)
+            if (getError() != error) {
+                setError(error)
+            }
         } else {
             setError(null)
         }
@@ -45,7 +47,9 @@ inline fun TextView.setErrorWhen(error: String?, crossinline condition: (CharSeq
 inline fun TextView.setErrorWhen(error: String?, crossinline condition: (CharSequence?) -> Boolean): TextWatcher {
     return addTextChangedListener(onTextChanged = { text, _, _, _ ->
         if (condition(text)) {
-            setError(error)
+            if (getError() != error) {
+                setError(error)
+            }
         } else {
             setError(null)
         }

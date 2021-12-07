@@ -30,7 +30,9 @@ fun TextInputLayout.setClearErrorOnType(): TextWatcher? {
 inline fun TextInputLayout.setErrorWhen(error: String?, crossinline condition: (CharSequence?, Int, Int, Int) -> Boolean): TextWatcher? {
     return editText?.addTextChangedListener(onTextChanged = { text, start, before, count ->
         if (condition(text, start, before, count)) {
-            setError(error)
+            if (getError() != error) {
+                setError(error)
+            }
         } else {
             setError(null)
         }
@@ -46,7 +48,9 @@ inline fun TextInputLayout.setErrorWhen(error: String?, crossinline condition: (
 inline fun TextInputLayout.setErrorWhen(error: String?, crossinline condition: (CharSequence?) -> Boolean): TextWatcher? {
     return editText?.addTextChangedListener(onTextChanged = { text, _, _, _ ->
         if (condition(text)) {
-            setError(error)
+            if (getError() != error) {
+                setError(error)
+            }
         } else {
             setError(null)
         }
