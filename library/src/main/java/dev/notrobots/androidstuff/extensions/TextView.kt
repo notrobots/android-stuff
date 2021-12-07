@@ -30,6 +30,8 @@ inline fun TextView.setErrorWhen(error: String?, crossinline condition: (CharSeq
     return addTextChangedListener(onTextChanged = { text, start, before, count ->
         if (condition(text, start, before, count)) {
             setError(error)
+        } else {
+            setError(null)
         }
     })
 }
@@ -44,6 +46,8 @@ inline fun TextView.setErrorWhen(error: String?, crossinline condition: (CharSeq
     return addTextChangedListener(onTextChanged = { text, _, _, _ ->
         if (condition(text)) {
             setError(error)
+        } else {
+            setError(null)
         }
     })
 }

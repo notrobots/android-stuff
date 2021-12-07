@@ -31,6 +31,8 @@ inline fun TextInputLayout.setErrorWhen(error: String?, crossinline condition: (
     return editText?.addTextChangedListener(onTextChanged = { text, start, before, count ->
         if (condition(text, start, before, count)) {
             setError(error)
+        } else {
+            setError(null)
         }
     })
 }
@@ -45,6 +47,8 @@ inline fun TextInputLayout.setErrorWhen(error: String?, crossinline condition: (
     return editText?.addTextChangedListener(onTextChanged = { text, _, _, _ ->
         if (condition(text)) {
             setError(error)
+        } else {
+            setError(null)
         }
     })
 }
