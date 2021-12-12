@@ -8,16 +8,47 @@ import android.graphics.Bitmap
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.util.TypedValue
+import android.view.View
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.print.PrintHelper
+import com.google.android.material.snackbar.Snackbar
 import dev.notrobots.androidstuff.util.now
 import kotlin.reflect.KClass
 
+fun Context.makeSnackBar(
+    content: Any?,
+    parent: View,
+    duration: Int = Snackbar.LENGTH_SHORT,
+    action: Any? = null,
+    actionCallback: (View, Snackbar) -> Unit = { _, _ -> }
+): Snackbar {
+    return Snackbar.make(
+        this,
+        parent,
+        idString(content, false),
+        duration
+    ).apply {
+        if (action != null) {
+            val actionName = idString(action, false)
+
+            setAction(actionName) {
+                actionCallback(it, this)
+            }
+        }
+
+        show()
+    }
+}
+
 fun Context.makeToast(content: Any?, duration: Int = Toast.LENGTH_SHORT): Toast {
-    return Toast.makeText(this, content.toString(), duration).also {
+    return Toast.makeText(
+        this,
+        idString(content, false),
+        duration
+    ).also {
         it.show()
     }
 }
@@ -82,5 +113,22 @@ fun Context.startActivity(activityClass: KClass<*>, factory: Intent.() -> Unit =
 fun Context.startActivity(activityClass: Class<*>, factory: Intent.() -> Unit = {}) {
     Intent(this, activityClass).apply(factory).also {
         startActivity(it)
+    }
+}
+
+fun Context.idString(value: Any?, replaceNull: Boolean = true, vararg args: Any?): String {
+    return String.format(idString(value, replaceNull), *args)
+}
+
+fun Context.idString(value: Any?, replaceNull: Boolean = true): String {
+    if (value == null) {
+        return if (replaceNull) "" else "null"
+    }
+
+    return when (value) {
+        is String -> value
+        is Int -> resources.getString(value)
+
+        else -> value.toString()
     }
 }

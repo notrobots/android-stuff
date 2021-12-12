@@ -27,7 +27,7 @@ fun parseColor(string: String): Int {
 }
 
 /**
- * Parses the given color int into an HEX string
+ * Parses the given [color] int into an HEX string
  */
 fun parseHEXColor(color: Int): String {
     return String.format("#%06X", 0xFFFFFF and color)
