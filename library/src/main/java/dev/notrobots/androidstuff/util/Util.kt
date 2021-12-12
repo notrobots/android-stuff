@@ -12,10 +12,6 @@ inline fun <reified E : Enum<E>> parseEnum(value: CharSequence?, ignoreCase: Boo
 
 //endregion
 
-fun error(message: String): Nothing {
-    throw Exception(message)
-}
-
 //region Errors/Exceptions
 
 inline fun <T : CharSequence> requireNotEmpty(value: T?, lazyMessage: () -> Any): T {
