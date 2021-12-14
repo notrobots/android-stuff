@@ -27,7 +27,7 @@ abstract class BindableViewHolder<T : ViewBinding> : BaseViewHolder {
         val bind = type.declaredFunctions.find {
             it.name == "bind" &&
             it.parameters.size == 1 &&
-            it.typeParameters[0] == View::class
+            it.parameters[0].type.classifier == View::class
         } ?: throw Exception("Cannot find method 'inflate(View)'")
 
         return bind.call(view) as T

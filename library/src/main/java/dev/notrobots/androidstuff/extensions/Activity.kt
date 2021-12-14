@@ -9,7 +9,7 @@ inline fun <reified T : ViewBinding> Activity.bindView(): T {
     val inflate = T::class.declaredFunctions.find {
         it.name == "inflate" &&
         it.parameters.size == 1 &&
-        it.typeParameters[0] == LayoutInflater::class
+        it.parameters[0].type.classifier == LayoutInflater::class
     } ?: throw Exception("Cannot find method 'inflate(LayoutInflate)'")
 
     return inflate.call(layoutInflater) as T
