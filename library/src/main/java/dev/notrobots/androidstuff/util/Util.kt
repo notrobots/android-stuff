@@ -1,5 +1,8 @@
 package dev.notrobots.androidstuff.util
 
+import android.app.Activity
+import androidx.viewbinding.ViewBinding
+import dev.notrobots.androidstuff.extensions.bindView
 import java.util.concurrent.TimeUnit
 
 //region Types
@@ -90,3 +93,9 @@ fun now(timeUnit: TimeUnit): Long {
 }
 
 //endregion
+
+inline fun <reified T : ViewBinding> viewBindings(activity: Activity): Lazy<T> {
+    return lazy {
+        activity.bindView()
+    }
+}
