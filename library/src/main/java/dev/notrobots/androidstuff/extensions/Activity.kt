@@ -14,3 +14,7 @@ inline fun <reified T : ViewBinding> Activity.bindView(): T {
 
     return inflate.call(layoutInflater) as T
 }
+
+inline fun <reified T : ViewBinding> Activity.viewBindings(): Lazy<T> {
+    return lazy { bindView() }
+}
