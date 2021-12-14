@@ -12,15 +12,11 @@ abstract class BindableViewHolder<T : ViewBinding> : BaseViewHolder {
     val binding: T
 
     constructor(itemView: View, type: KClass<T>) : super(itemView) {
-        this.binding = bind(itemView, type)
+        this.binding = bind(super.itemView, type)
     }
 
     constructor(@LayoutRes layoutRes: Int, parent: ViewGroup, type: KClass<T>) : super(layoutRes, parent) {
-        val view = LayoutInflater
-            .from(parent.context)
-            .inflate(layoutRes, parent, false)
-
-        this.binding = bind(view, type)
+        this.binding = bind(super.itemView, type)
     }
 
     private fun <T : ViewBinding> bind(view: View, type: KClass<T>): T {
