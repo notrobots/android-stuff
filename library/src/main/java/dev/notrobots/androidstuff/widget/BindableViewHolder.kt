@@ -8,7 +8,7 @@ import androidx.viewbinding.ViewBinding
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredFunctions
 
-class BindableViewHolder<T : ViewBinding> : BaseViewHolder {
+abstract class BindableViewHolder<T : ViewBinding> : BaseViewHolder {
     val binding: T
 
     constructor(itemView: View, type: KClass<T>) : super(itemView) {
