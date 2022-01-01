@@ -99,6 +99,20 @@ fun now(timeUnit: TimeUnit): Long {
 //region View Bindings
 
 /**
+ * Creates a ViewBinding of the specified type using the given [context]
+ */
+inline fun <reified T : ViewBinding> bindView(context: Context): T {
+    return bindView(LayoutInflater.from(context))
+}
+
+/**
+ * Creates a ViewBinding of the specified type using the given [activity]
+ */
+inline fun <reified T : ViewBinding> bindView(activity: Activity): T {
+    return bindView(activity.layoutInflater)
+}
+
+/**
  * Creates a ViewBinding of the specified type using the given [layoutInflater]
  */
 inline fun <reified T : ViewBinding> bindView(layoutInflater: LayoutInflater): T {
@@ -119,12 +133,14 @@ inline fun <reified T : ViewBinding> viewBindings(layoutInflater: LayoutInflater
 
 inline fun <reified T : ViewBinding> viewBindings(activity: Activity): Lazy<T> {
     return lazy {
-        bindView(activity.layoutInflater)
+        bindView(activity)
     }
 }
 
 inline fun <reified T : ViewBinding> viewBindings(context: Context): Lazy<T> {
-    return lazy { bindView(LayoutInflater.from(context)) }
+    return lazy {
+        bindView(context)
+    }
 }
 
 //endregion
