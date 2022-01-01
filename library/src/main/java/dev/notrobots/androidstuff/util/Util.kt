@@ -1,9 +1,11 @@
 package dev.notrobots.androidstuff.util
 
 import android.app.Activity
+import android.content.Context
+import android.view.LayoutInflater
 import androidx.viewbinding.ViewBinding
-import dev.notrobots.androidstuff.extensions.bindView
 import java.util.concurrent.TimeUnit
+import kotlin.reflect.full.declaredFunctions
 
 //region Types
 
@@ -94,8 +96,35 @@ fun now(timeUnit: TimeUnit): Long {
 
 //endregion
 
-inline fun <reified T : ViewBinding> viewBindings(activity: Activity): Lazy<T> {
+//region View Bindings
+
+/**
+ * Creates a ViewBinding of the specified type using the given [layoutInflater]
+ */
+inline fun <reified T : ViewBinding> bindView(layoutInflater: LayoutInflater): T {
+    val inflate = T::class.declaredFunctions.find {
+        it.name == "inflate" &&
+        it.parameters.size == 1 &&
+        it.parameters[0].type.classifier == LayoutInflater::class
+    } ?: throw Exception("Cannot find method 'inflate(LayoutInflate)'")
+
+    return inflate.call(layoutInflater) as T
+}
+
+inline fun <reified T : ViewBinding> viewBindings(layoutInflater: LayoutInflater): Lazy<T> {
     return lazy {
-        activity.bindView()
+        bindView(layoutInflater)
     }
 }
+
+inline fun <reified T : ViewBinding> viewBindings(activity: Activity): Lazy<T> {
+    return lazy {
+        bindView(activity.layoutInflater)
+    }
+}
+
+inline fun <reified T : ViewBinding> viewBindings(context: Context): Lazy<T> {
+    return lazy { bindView(LayoutInflater.from(context)) }
+}
+
+//endregion
