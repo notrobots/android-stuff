@@ -5,6 +5,10 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
+import android.os.Build
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.util.TypedValue
@@ -13,6 +17,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.print.PrintHelper
 import com.google.android.material.snackbar.Snackbar
 import dev.notrobots.androidstuff.util.now
@@ -28,11 +33,11 @@ fun Context.makeSnackBar(
     return Snackbar.make(
         this,
         parent,
-        idString(content, false),
+        resolveString(content, false),
         duration
     ).apply {
         if (action != null) {
-            val actionName = idString(action, false)
+            val actionName = resolveString(action, false)
 
             setAction(actionName) {
                 actionCallback(it, this)
@@ -46,7 +51,7 @@ fun Context.makeSnackBar(
 fun Context.makeToast(content: Any?, duration: Int = Toast.LENGTH_SHORT): Toast {
     return Toast.makeText(
         this,
-        idString(content, false),
+        resolveString(content, false),
         duration
     ).also {
         it.show()
@@ -116,11 +121,13 @@ fun Context.startActivity(activityClass: Class<*>, factory: Intent.() -> Unit = 
     }
 }
 
-fun Context.idString(value: Any?, replaceNull: Boolean = true, vararg args: Any?): String {
-    return String.format(idString(value, replaceNull), *args)
+//region Resolve utils
+
+fun Context.resolveString(value: Any?, replaceNull: Boolean = true, vararg args: Any?): String {
+    return String.format(resolveString(value, replaceNull), *args)
 }
 
-fun Context.idString(value: Any?, replaceNull: Boolean = true): String {
+fun Context.resolveString(value: Any?, replaceNull: Boolean = true): String {
     if (value == null) {
         return if (replaceNull) "" else "null"
     }
@@ -132,3 +139,38 @@ fun Context.idString(value: Any?, replaceNull: Boolean = true): String {
         else -> value.toString()
     }
 }
+
+fun Context.resolveDrawable(value: Any?): Drawable? {
+    if (value == null) {
+        return null
+    }
+
+    return when (value) {
+        is Drawable -> value
+        is Int -> ContextCompat.getDrawable(this, value)
+
+        else -> throw Exception("Unknown type")
+    }
+}
+
+fun Context.resolveColor(value: Any?): Int {
+    if (value == null) {
+        return Color.WHITE
+    }
+
+    return when (value) {
+        is ColorDrawable -> value.color
+        is Int -> ContextCompat.getColor(this, value)
+        is Color -> {
+            if (Build.VERSION.SDK_INT >= 26) {
+                value.toArgb()
+            } else {
+                throw Exception("Call requires API level 26")
+            }
+        }
+
+        else -> throw Exception("Unknown type")
+    }
+}
+
+//endregion
