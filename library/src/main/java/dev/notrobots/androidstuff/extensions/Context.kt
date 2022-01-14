@@ -1,5 +1,6 @@
 package dev.notrobots.androidstuff.extensions
 
+import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -16,9 +17,11 @@ import android.view.View
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.print.PrintHelper
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dev.notrobots.androidstuff.util.now
 import kotlin.reflect.KClass
@@ -56,6 +59,92 @@ fun Context.makeToast(content: Any?, duration: Int = Toast.LENGTH_SHORT): Toast 
     ).also {
         it.show()
     }
+}
+
+/**
+ * Shows a dialog with the given [title] and [message]
+ */
+fun Context.showInfo(
+    title: Any?,
+    message: Any? = null,
+    positiveButton: Any? = "Ok",
+    positiveCallback: () -> Unit = {}
+): Dialog {
+    return MaterialAlertDialogBuilder(this)
+        .setTitle(resolveString(title))
+        .setMessage(resolveString(message))
+        .setPositiveButton(resolveString(positiveButton)) { _, _ -> positiveCallback() }
+        .create()
+        .apply {
+            show()
+        }
+}
+
+/**
+ * Shows a dialog with the given [title], [message] and two choices
+ */
+fun Context.showChoice(
+    title: Any?,
+    message: Any? = null,
+    positiveButton: Any? = "Ok",
+    positiveCallback: () -> Unit = {},
+    negativeButton: Any? = "Cancel",
+    negativeCallback: () -> Unit = {},
+): Dialog {
+    return MaterialAlertDialogBuilder(this)
+        .setTitle(resolveString(title))
+        .setMessage(resolveString(message))
+        .setPositiveButton(resolveString(positiveButton)) { _, _ -> positiveCallback() }
+        .setNegativeButton(resolveString(negativeButton)) { _, _ -> negativeCallback() }
+        .create()
+        .apply {
+            show()
+        }
+}
+
+/**
+ * Shows a dialog with the given [title], [items] and choices
+ */
+fun <T> Context.showList(
+    title: Any?,
+    items: List<T>,
+    itemClickListener: (T) -> Unit = {},
+    positiveButton: Any? = "Ok",
+    positiveCallback: () -> Unit = {},
+    negativeButton: Any? = null,
+    negativeCallback: () -> Unit = {},
+    neutralButton: Any? = null,
+    neutralCallback: () -> Unit = {},
+): Dialog {
+    val dialog = MaterialAlertDialogBuilder(this)
+        .setTitle(resolveString(title))
+    val adapter = ArrayAdapter(
+        this,
+        android.R.layout.simple_list_item_1,
+        items
+    )
+
+    dialog.setAdapter(adapter, null)
+
+    if (positiveButton != null) {
+        dialog.setPositiveButton(resolveString(positiveButton)) { _, _ -> positiveCallback() }
+    }
+
+    if (negativeButton != null) {
+        dialog.setNegativeButton(resolveString(negativeButton)) { _, _ -> negativeCallback() }
+    }
+
+    if (neutralButton != null) {
+        dialog.setNeutralButton(resolveString(neutralButton)) { _, _ -> neutralCallback() }
+    }
+
+    return dialog.create()
+        .apply {
+            listView.setOnItemClickListener { _, _, i, _ ->
+                itemClickListener(items[i])
+            }
+            show()
+        }
 }
 
 fun Context.copyToClipboard(content: Any?) {
