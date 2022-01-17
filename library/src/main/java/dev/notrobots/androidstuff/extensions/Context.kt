@@ -61,6 +61,8 @@ fun Context.makeToast(content: Any?, duration: Int = Toast.LENGTH_SHORT): Toast 
     }
 }
 
+//region Dialogs
+
 /**
  * Shows a dialog with the given [title] and [message]
  */
@@ -116,13 +118,41 @@ fun <T> Context.showList(
     neutralButton: Any? = null,
     neutralCallback: () -> Unit = {},
 ): Dialog {
-    val dialog = MaterialAlertDialogBuilder(this)
-        .setTitle(resolveString(title))
     val adapter = ArrayAdapter(
         this,
         android.R.layout.simple_list_item_1,
         items
     )
+
+    return showList(
+        title,
+        adapter,
+        itemClickListener,
+        positiveButton,
+        positiveCallback,
+        negativeButton,
+        negativeCallback,
+        neutralButton,
+        neutralCallback
+    )
+}
+
+/**
+ * Shows a dialog with the given [title], [adapter] and choices
+ */
+fun <T> Context.showList(
+    title: Any?,
+    adapter: ArrayAdapter<T>,
+    itemClickListener: (T) -> Unit = {},    //TODO: Pass the dialog instance
+    positiveButton: Any? = "Ok",
+    positiveCallback: () -> Unit = {},
+    negativeButton: Any? = null,
+    negativeCallback: () -> Unit = {},
+    neutralButton: Any? = null,
+    neutralCallback: () -> Unit = {},
+): Dialog {
+    val dialog = MaterialAlertDialogBuilder(this)
+        .setTitle(resolveString(title))
 
     dialog.setAdapter(adapter, null)
 
@@ -141,11 +171,13 @@ fun <T> Context.showList(
     return dialog.create()
         .apply {
             listView.setOnItemClickListener { _, _, i, _ ->
-                itemClickListener(items[i])
+                itemClickListener(adapter.getItem(i)!!)
             }
             show()
         }
 }
+
+//endregion
 
 fun Context.copyToClipboard(content: Any?) {
     val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
