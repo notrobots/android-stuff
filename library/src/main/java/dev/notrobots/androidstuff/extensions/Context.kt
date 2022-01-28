@@ -209,10 +209,12 @@ fun Context.printImage(
 fun Context.printHTML(
     html: String,
     jobName: String = "${now() / 1000}",
-    attributes: PrintAttributes = PrintAttributes.Builder().build()
+    attributes: PrintAttributes = PrintAttributes.Builder().build(),
+    javaScriptEnabled: Boolean = false
 ) {
     val webView = WebView(this)
 
+    webView.settings.javaScriptEnabled = javaScriptEnabled
     webView.webViewClient = object : WebViewClient() {
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest) = false
 
