@@ -13,12 +13,15 @@ import android.os.Build
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
 import androidx.print.PrintHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -297,3 +300,14 @@ fun Context.resolveColor(value: Any?): Int {
 }
 
 //endregion
+
+fun Context.inflate(
+    @LayoutRes layoutRes: Int,
+    parent: ViewGroup? = null,
+    attachToRoot: Boolean = false,
+    block: (View) -> Unit = {}
+): View {
+    return LayoutInflater.from(this)
+        .inflate(layoutRes, parent, attachToRoot)
+        .also(block)
+}
