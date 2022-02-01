@@ -3,6 +3,9 @@ package dev.notrobots.androidstuff.util
 import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.annotation.LayoutRes
 import androidx.viewbinding.ViewBinding
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.full.declaredFunctions
@@ -118,11 +121,52 @@ inline fun <reified T : ViewBinding> bindView(activity: Activity): T {
 inline fun <reified T : ViewBinding> bindView(layoutInflater: LayoutInflater): T {
     val inflate = T::class.declaredFunctions.find {
         it.name == "inflate" &&
-        it.parameters.size == 1 &&
-        it.parameters[0].type.classifier == LayoutInflater::class
+                it.parameters.size == 1 &&
+                it.parameters[0].type.classifier == LayoutInflater::class
     } ?: throw Exception("Cannot find method 'inflate(LayoutInflate)'")
 
     return inflate.call(layoutInflater) as T
+}
+
+inline fun <reified T : ViewBinding> viewBindings(view: View): Lazy<T> {
+    return lazy {
+        val bind = T::class.declaredFunctions.find {
+            it.name == "bind" &&
+                    it.parameters.size == 1 &&
+                    it.parameters[0].type.classifier == View::class
+        } ?: throw Exception("Cannot find method 'bind(View)'")
+
+        bind.call(view) as T
+    }
+}
+
+inline fun <reified T : ViewBinding> viewBindings(
+    layoutInflater: LayoutInflater,
+    parent: ViewGroup? = null,
+    attachToRoot: Boolean = false
+): Lazy<T> {
+    return lazy {
+        val inflate = T::class.declaredFunctions.find {
+            it.name == "inflate" &&
+                    it.parameters.size == 3 &&
+                    it.parameters[0].type.classifier == LayoutInflater::class &&
+                    it.parameters[1].type.classifier == ViewGroup::class &&
+                    it.parameters[2].type.classifier == Boolean::class
+        } ?: throw Exception("Cannot find method 'bind(View)'")
+
+        inflate.call(layoutInflater, parent, attachToRoot) as T
+    }
+}
+
+inline fun <reified T : ViewBinding> viewBindings(
+    @LayoutRes layoutRes: Int,
+    parent: ViewGroup,
+    attachToRoot: Boolean = false
+): Lazy<T> {
+    val inflater = LayoutInflater.from(parent.context)
+    val view = inflater.inflate(layoutRes, parent, attachToRoot)
+
+    return viewBindings(view)
 }
 
 inline fun <reified T : ViewBinding> viewBindings(layoutInflater: LayoutInflater): Lazy<T> {
