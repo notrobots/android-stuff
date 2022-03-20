@@ -12,6 +12,12 @@ import kotlin.reflect.full.declaredFunctions
 
 //region Types
 
+inline fun <reified E : Enum<E>> parseEnum(ordinal: Int?): E? {
+    val values = E::class.java.enumConstants
+
+    return values[ordinal ?: 0]
+}
+
 inline fun <reified E : Enum<E>> parseEnum(value: CharSequence?, ignoreCase: Boolean = false): E? {
     val values = E::class.java.enumConstants
 
