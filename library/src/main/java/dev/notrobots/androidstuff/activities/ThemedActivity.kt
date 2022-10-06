@@ -60,4 +60,15 @@ abstract class ThemedActivity : AppCompatActivity() {
     protected fun disableTitle() {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
     }
+    
+    /**
+     * Enables/Disables screenshots/screen recordings in this activity.
+     */
+    protected fun setScreenshotsEnabled(enabled: Boolean) {
+        if (enabled) {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        } else {
+            window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+        }
+    }
 }
