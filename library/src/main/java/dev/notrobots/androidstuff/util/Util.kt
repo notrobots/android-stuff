@@ -12,16 +12,16 @@ import kotlin.reflect.full.declaredFunctions
 
 //region Types
 
-inline fun <reified E : Enum<E>> parseEnum(ordinal: Int?): E? {
-    val values = E::class.java.enumConstants
+inline fun <reified E : Enum<E>> parseEnum(value: CharSequence?, ignoreCase: Boolean = false): E {
+    val values = E::class.java.enumConstants!!
 
-    return values[ordinal ?: 0]
-}
+    require(values.isNotEmpty()) {
+        "Enum type ${E::class} has no values"
+    }
 
-inline fun <reified E : Enum<E>> parseEnum(value: CharSequence?, ignoreCase: Boolean = false): E? {
-    val values = E::class.java.enumConstants
-
-    return values.find { it.name.equals(value.toString(), ignoreCase) }
+    return values.find {
+        it.name.equals(value.toString(), ignoreCase)
+    } ?: throw Exception("Enum type ${E::class} has no value \"$value\"")
 }
 
 //endregion
