@@ -6,6 +6,9 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 
+/**
+ * Base boilerplate ViewHolder.
+ */
 abstract class BaseViewHolder : RecyclerView.ViewHolder {
     constructor(itemView: View) : super(itemView)
 
