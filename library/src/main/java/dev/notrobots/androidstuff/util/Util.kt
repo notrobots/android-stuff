@@ -4,6 +4,8 @@ package dev.notrobots.androidstuff.util
 
 import android.graphics.Color
 import java.util.concurrent.TimeUnit
+import kotlin.reflect.KClass
+import kotlin.reflect.jvm.isAccessible
 
 //region Parsing
 
@@ -131,3 +133,29 @@ fun now(timeUnit: TimeUnit): Long {
 }
 
 //endregion
+
+/**
+ * Creates a new instance of the Lazy that uses the specified type.
+ *
+ * The type must have an empty constructor.
+ */
+inline fun <reified T : Any> lazyType(crossinline initializer: T.() -> Unit = {}): Lazy<T> {
+    return lazyType(T::class, initializer)
+}
+
+/**
+ * Creates a new instance of the Lazy that uses the specified [type].
+ *
+ * The type must have an empty constructor.
+ */
+inline fun <reified T : Any> lazyType(type: KClass<T>, crossinline initializer: T.() -> Unit = {}): Lazy<T> {
+    val emptyConstructor = type.constructors.find {
+        it.parameters.isEmpty()
+    } ?: throw Exception("Type $type has no empty constructor")
+
+    emptyConstructor.isAccessible = true
+
+    return lazy {
+        emptyConstructor.call().apply(initializer)
+    }
+}
