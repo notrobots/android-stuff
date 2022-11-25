@@ -1,5 +1,6 @@
 package dev.notrobots.androidstuff.extensions
 
+import android.text.InputFilter
 import android.text.TextWatcher
 import androidx.annotation.StringRes
 import androidx.core.widget.addTextChangedListener
@@ -158,4 +159,21 @@ fun TextInputLayout.addTextChangedListener(textWatcher: TextWatcher) {
  */
 fun TextInputLayout.removeTextChangedListener(textWatcher: TextWatcher) {
     editText?.removeTextChangedListener(textWatcher)
+}
+
+/**
+ * Sets the maximum length of this [TextInputLayout] and its [TextInputLayout.editText].
+ *
+ * This will also set [TextInputLayout.isCounterEnabled] to true.
+ */
+fun TextInputLayout.setMaxLength(
+    maxLength: Int,
+    enableCounter: Boolean = true
+) {
+    editText?.let {
+        it.filters += InputFilter.LengthFilter(maxLength)
+    }
+
+    counterMaxLength = maxLength
+    isCounterEnabled = enableCounter
 }

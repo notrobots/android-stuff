@@ -66,3 +66,18 @@ fun <T> Iterable<T>.allIndexed(predicate: (Int, T) -> Boolean): Boolean {
 
     return true
 }
+
+fun <T> Iterable<T>.joinToStringIndexed(
+    separator: CharSequence = ", ",
+    prefix: CharSequence = "",
+    postfix: CharSequence = "",
+    limit: Int = -1,
+    truncated: CharSequence = "...",
+    transform: (index: Int, T) -> CharSequence
+): String {
+    var index = 0
+
+    return joinToString(separator, prefix, postfix, limit, truncated) {
+        transform(index++, it)
+    }
+}

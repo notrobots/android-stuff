@@ -21,6 +21,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.annotation.AttrRes
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
 import androidx.print.PrintHelper
@@ -189,13 +190,6 @@ fun Context.copyToClipboard(content: Any?) {
     clipboardManager.setPrimaryClip(clip)
 }
 
-fun Context.resolveColorAttribute(id: Int): Int {
-    return TypedValue().run {
-        theme.resolveAttribute(id, this, true)
-        data
-    }
-}
-
 //region Print utils
 
 fun Context.printImage(
@@ -249,10 +243,33 @@ fun Context.startActivity(activityClass: Class<*>, factory: Intent.() -> Unit = 
 
 //region Resolve utils
 
+/**
+ * Returns the color for the given attribute [id] for the current theme
+ */
+fun Context.resolveColorAttribute(@AttrRes id: Int): Int {
+    return TypedValue().run {
+        theme.resolveAttribute(id, this, true)
+        data
+    }
+}
+
+/**
+ * Resolves the given string [value], which can be either [String] or [Int] (String Resource).
+ *
+ * @param value The value to be resolved.
+ * @param replaceNull Whether or not "null" will be replace with an empty string.
+ * @param args Format arguments.
+ */
 fun Context.resolveString(value: Any?, replaceNull: Boolean = true, vararg args: Any?): String {
     return String.format(resolveString(value, replaceNull), *args)
 }
 
+/**
+ * Resolves the given string [value], which can be either [String] or [Int] (String Resource ID).
+ *
+ * @param value The value to be resolved.
+ * @param replaceNull Whether or not "null" will be replace with an empty string.
+ */
 fun Context.resolveString(value: Any?, replaceNull: Boolean = true): String {
     if (value == null) {
         return if (replaceNull) "" else "null"
@@ -266,6 +283,13 @@ fun Context.resolveString(value: Any?, replaceNull: Boolean = true): String {
     }
 }
 
+/**
+ * Resolves the given drawable [value], which can be one of:
+ * + [Drawable]
+ * + [Int] (Drawable Resource ID)
+ *
+ * @param value The value to be resolved.
+ */
 fun Context.resolveDrawable(value: Any?): Drawable? {
     if (value == null) {
         return null
@@ -279,6 +303,14 @@ fun Context.resolveDrawable(value: Any?): Drawable? {
     }
 }
 
+/**
+ * Resolves the given color [value], which can be one of:
+ * + [ColorDrawable]
+ * + [Int]
+ * + [Color]
+ *
+ * @param value The value to be resolved.
+ */
 fun Context.resolveColor(value: Any?): Int {
     if (value == null) {
         return Color.WHITE
@@ -300,14 +332,3 @@ fun Context.resolveColor(value: Any?): Int {
 }
 
 //endregion
-
-fun Context.inflate(
-    @LayoutRes layoutRes: Int,
-    parent: ViewGroup? = null,
-    attachToRoot: Boolean = false,
-    block: (View) -> Unit = {}
-): View {
-    return LayoutInflater.from(this)
-        .inflate(layoutRes, parent, attachToRoot)
-        .also(block)
-}
