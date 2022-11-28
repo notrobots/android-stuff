@@ -3,34 +3,34 @@ package dev.notrobots.androidstuff.util
 import android.app.Activity
 import android.util.Log as AndroidLog
 
-interface AbsLog {
+abstract class AbsLogger {
     /**
      * Whether or not the logging is enabled for this logger.
      */
-    var isLoggingEnabled: Boolean
+    abstract var isLoggingEnabled: Boolean
 
     /**
      * Tag used for the logs.
      */
-    var tag: Any?
+    abstract var tag: Any?
 
-    fun log(message: Any?, tag: Any?, priority: LogPriority)
+    abstract fun log(message: Any?, tag: Any?, priority: LogPriority)
 
-    fun log(message: Any?, priority: LogPriority)
+    abstract fun log(message: Any?, priority: LogPriority)
 
-    fun loge(message: Any?) = log(message, LogPriority.Error)
+    open fun loge(message: Any?) = log(message, LogPriority.Error)
 
-    fun logd(message: Any?) = log(message, LogPriority.Debug)
+    open fun logd(message: Any?) = log(message, LogPriority.Debug)
 
-    fun logi(message: Any?) = log(message, LogPriority.Info)
+    open fun logi(message: Any?) = log(message, LogPriority.Info)
 
-    fun log(message: Any?) = log(message, LogPriority.Verbose)
+    open fun log(message: Any?) = log(message, LogPriority.Verbose)
 
-    fun logw(message: Any?) = log(message, LogPriority.Warn)
+    open fun logw(message: Any?) = log(message, LogPriority.Warn)
 
-    fun loga(message: Any?) = log(message, LogPriority.Assert)
+    open fun loga(message: Any?) = log(message, LogPriority.Assert)
 
-    fun loge(exception: Exception, full: Boolean = true) {
+    open fun loge(exception: Exception, full: Boolean = true) {
         log(if (full) exception.stackTraceToString() else exception.message, LogPriority.Error)
     }
 }
@@ -44,7 +44,7 @@ enum class LogPriority(val value: Int) {
     Verbose(AndroidLog.VERBOSE)
 }
 
-class Log(tag: Any?) : AbsLog {
+class Logger(tag: Any?) : AbsLogger() {
     override var tag: Any? = tag
     override var isLoggingEnabled: Boolean = true
 
@@ -58,7 +58,7 @@ class Log(tag: Any?) : AbsLog {
         log(message, tag, priority, Companion.isLoggingEnabled)
     }
 
-    companion object : AbsLog {
+    companion object : AbsLogger() {
         override var tag: Any? = null
         override var isLoggingEnabled: Boolean = true
 
