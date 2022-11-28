@@ -3,7 +3,7 @@ package dev.notrobots.androidstuff.util
 import android.app.Activity
 import android.util.Log as AndroidLog
 
-interface ILog {
+interface AbsLog {
     /**
      * Whether or not the logging is enabled for this logger.
      */
@@ -44,36 +44,34 @@ enum class LogPriority(val value: Int) {
     Verbose(AndroidLog.VERBOSE)
 }
 
-class Log(tag: Any?) : ILog {
+class Log(tag: Any?) : AbsLog {
     override var tag: Any? = tag
     override var isLoggingEnabled: Boolean = true
 
     constructor(activity: Activity) : this(activity.componentName.className)
 
     override fun log(message: Any?, tag: Any?, priority: LogPriority) {
-        if (isLoggingEnabled) {
-            AndroidLog.println(priority.value, tag.toString(), message.toString())
-        }
+        log(message, tag, priority, Companion.isLoggingEnabled)
     }
 
     override fun log(message: Any?, priority: LogPriority) {
-        if (isLoggingEnabled) {
-            AndroidLog.println(priority.value, tag.toString(), message.toString())
-        }
+        log(message, tag, priority, Companion.isLoggingEnabled)
     }
 
-    companion object : ILog {
+    companion object : AbsLog {
         override var tag: Any? = null
         override var isLoggingEnabled: Boolean = true
 
         override fun log(message: Any?, tag: Any?, priority: LogPriority) {
-            if (isLoggingEnabled) {
-                AndroidLog.println(priority.value, tag.toString(), message.toString())
-            }
+            log(message, tag, priority, isLoggingEnabled)
         }
 
         override fun log(message: Any?, priority: LogPriority) {
-            if (isLoggingEnabled) {
+            log(message, tag, priority, isLoggingEnabled)
+        }
+
+        private fun log(message: Any?, tag: Any?, priority: LogPriority, isEnabled: Boolean) {
+            if (isEnabled) {
                 AndroidLog.println(priority.value, tag.toString(), message.toString())
             }
         }
