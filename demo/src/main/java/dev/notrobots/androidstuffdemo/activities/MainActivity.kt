@@ -7,12 +7,15 @@ import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import dev.notrobots.androidstuff.extensions.makeToast
 import dev.notrobots.androidstuff.extensions.startActivity
+import dev.notrobots.androidstuff.util.AbsLogger
+import dev.notrobots.androidstuff.util.Logger
 import dev.notrobots.androidstuffdemo.R
 
 class MainActivity : AppCompatActivity() {
     private val demos = listOf(
         ViewBindingsDemo::class
     )
+    private val logger = Logger(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,5 +40,19 @@ class MainActivity : AppCompatActivity() {
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }
+
+        testLogger(logger)
+
+        Logger.tag = "Static Logger"
+        testLogger(Logger)
+    }
+
+    private fun testLogger(logger: AbsLogger) {
+        logger.logw("This is a warning log", Exception("Blah blah blah"))
+        logger.logi("This is an info log", Exception("Blah blah blah"))
+        logger.logd("This is a debug log", Exception("Blah blah blah"))
+        logger.loge("This is an error log", Exception("Blah blah blah"))
+        logger.log("This is a verbose log", Exception("Blah blah blah"))
+        logger.logwtf("This is a wtf log", Exception("Blah blah blah"))
     }
 }

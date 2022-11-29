@@ -1,78 +1,134 @@
 package dev.notrobots.androidstuff.util
 
-import android.app.Activity
+import android.os.Build
+import dev.notrobots.androidstuff.BuildConfig
+import dev.notrobots.androidstuff.extensions.toStringOrEmpty
 import android.util.Log as AndroidLog
 
 abstract class AbsLogger {
     /**
-     * Whether or not the logging is enabled for this logger.
-     */
-    abstract var isLoggingEnabled: Boolean
-
-    /**
      * Tag used for the logs.
      */
-    abstract var tag: Any?
+    abstract var tag: String?
 
-    abstract fun log(message: Any?, tag: Any?, priority: LogPriority)
+    abstract fun log(
+        message: Any?,
+        throwable: Throwable? = null,
+        level: LogLevel,
+        enabled: Boolean = true,
+        debugOnly: Boolean = true,
+    )
 
-    abstract fun log(message: Any?, priority: LogPriority)
+    open fun log(
+        message: Any?,
+        throwable: Throwable? = null,
+        enabled: Boolean = true,
+        debugOnly: Boolean = true,
+    ) = log(message, throwable, LogLevel.Verbose, enabled, debugOnly)
 
-    open fun loge(message: Any?) = log(message, LogPriority.Error)
+    open fun loge(
+        message: Any?,
+        throwable: Throwable? = null,
+        enabled: Boolean = true,
+        debugOnly: Boolean = true,
+    ) = log(message, throwable, LogLevel.Error, enabled, debugOnly)
 
-    open fun logd(message: Any?) = log(message, LogPriority.Debug)
+    open fun logd(
+        message: Any?,
+        throwable: Throwable? = null,
+        enabled: Boolean = true,
+        debugOnly: Boolean = true,
+    ) = log(message, throwable, LogLevel.Debug, enabled, debugOnly)
 
-    open fun logi(message: Any?) = log(message, LogPriority.Info)
+    open fun logi(
+        message: Any?,
+        throwable: Throwable? = null,
+        enabled: Boolean = true,
+        debugOnly: Boolean = true,
+    ) = log(message, throwable, LogLevel.Info, enabled, debugOnly)
 
-    open fun log(message: Any?) = log(message, LogPriority.Verbose)
+    open fun logw(
+        message: Any?,
+        throwable: Throwable? = null,
+        enabled: Boolean = true,
+        debugOnly: Boolean = true,
+    ) = log(message, throwable, LogLevel.Warn, enabled, debugOnly)
 
-    open fun logw(message: Any?) = log(message, LogPriority.Warn)
-
-    open fun loga(message: Any?) = log(message, LogPriority.Assert)
-
-    open fun loge(exception: Exception, full: Boolean = true) {
-        log(if (full) exception.stackTraceToString() else exception.message, LogPriority.Error)
-    }
+    open fun logwtf(
+        message: Any?,
+        throwable: Throwable? = null,
+        enabled: Boolean = true,
+        debugOnly: Boolean = true,
+    ) = log(message, throwable, LogLevel.Warn, enabled, debugOnly)
 }
 
-enum class LogPriority(val value: Int) {
-    Assert(AndroidLog.ASSERT),
-    Debug(AndroidLog.DEBUG),
-    Error(AndroidLog.ERROR),
-    Info(AndroidLog.INFO),
-    Warn(AndroidLog.WARN),
-    Verbose(AndroidLog.VERBOSE)
+enum class LogLevel {
+    Debug,
+    Error,
+    WTF,
+    Info,
+    Warn,
+    Verbose
 }
 
-class Logger(tag: Any?) : AbsLogger() {
-    override var tag: Any? = tag
-    override var isLoggingEnabled: Boolean = true
+class Logger(tag: String?) : AbsLogger() {
+    override var tag: String? = tag
 
-    constructor(activity: Activity) : this(activity.componentName.className)
+    constructor(any: Any) : this(any::class.simpleName)
 
-    override fun log(message: Any?, tag: Any?, priority: LogPriority) {
-        log(message, tag, priority, Companion.isLoggingEnabled)
-    }
-
-    override fun log(message: Any?, priority: LogPriority) {
-        log(message, tag, priority, Companion.isLoggingEnabled)
+    override fun log(
+        message: Any?,
+        throwable: Throwable?,
+        level: LogLevel,
+        enabled: Boolean,
+        debugOnly: Boolean,
+    ) {
+        log(message, throwable, tag, level, enabled, debugOnly)
     }
 
     companion object : AbsLogger() {
-        override var tag: Any? = null
-        override var isLoggingEnabled: Boolean = true
+        override var tag: String? = null
 
-        override fun log(message: Any?, tag: Any?, priority: LogPriority) {
-            log(message, tag, priority, isLoggingEnabled)
+        override fun log(
+            message: Any?,
+            throwable: Throwable?,
+            level: LogLevel,
+            enabled: Boolean,
+            debugOnly: Boolean,
+        ) {
+            log(message, throwable, tag, level, enabled, debugOnly)
         }
 
-        override fun log(message: Any?, priority: LogPriority) {
-            log(message, tag, priority, isLoggingEnabled)
-        }
+        /**
+         * Default implementation for both static and non-static.
+         */
+        private fun log(
+            message: Any?,
+            throwable: Throwable?,
+            tag: String?,
+            level: LogLevel,
+            enabled: Boolean,
+            debugOnly: Boolean,
+        ) {
+            val tag = tag ?: ""
+            val message = message.toStringOrEmpty()
 
-        private fun log(message: Any?, tag: Any?, priority: LogPriority, isEnabled: Boolean) {
-            if (isEnabled) {
-                AndroidLog.println(priority.value, tag.toString(), message.toString())
+            if (!enabled) return
+
+            if (debugOnly && !BuildConfig.DEBUG) return
+
+            if (Build.VERSION.SDK_INT <= 25 && tag.length > 23) {
+                loge("Tag length must be 23 or less, message will be ignored")
+                return
+            }
+
+            when (level) {
+                LogLevel.Debug -> AndroidLog.d(tag, message, throwable)
+                LogLevel.Error -> AndroidLog.e(tag, message, throwable)
+                LogLevel.Info -> AndroidLog.i(tag, message, throwable)
+                LogLevel.Warn -> AndroidLog.w(tag, message, throwable)
+                LogLevel.Verbose -> AndroidLog.v(tag, message, throwable)
+                LogLevel.WTF -> AndroidLog.wtf(tag, message, throwable)
             }
         }
     }
