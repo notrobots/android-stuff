@@ -115,7 +115,7 @@ class Logger(tag: String?) : AbsLogger() {
 
             if (!enabled) return
 
-            if (debugOnly && !BuildConfig.DEBUG) return
+            if (debugOnly && BuildConfig.DEBUG) return
 
             if (Build.VERSION.SDK_INT <= 25 && tag.length > 23) {
                 loge("Tag length must be 23 or less, message will be ignored")
